@@ -494,7 +494,7 @@ run "Installing Docker Compose" \
 	    "docker run -i --rm --privileged --name ubuntu-installer ${DOCKER_PROXY_ENV} -v /dev:/dev -v /sys/:/sys/ -v $ROOTFS:/target/root ubuntu:${param_ubuntuversion} sh -c \
 	    'apt-get update && \
 	    apt-get install -y git libfdt-dev libpixman-1-dev libssl-dev vim socat libsdl2-dev libspice-server-dev autoconf libtool xtightvncviewer tightvncserver x11vnc uuid-runtime uuid uml-utilities bridge-utils python-dev liblzma-dev libc6-dev libegl1-mesa-dev libepoxy-dev libdrm-dev libgbm-dev libaio-dev libusb-1.0.0-dev libgtk-3-dev bison  && \
-	    dpkg-reconfigure -f noninteractive tzdata &&、\
+	    dpkg-reconfigure -f noninteractive tzdata && \
 
 	    cd /root  && \
 	    git clone https://git.qemu.org/git/qemu.git && \
@@ -503,32 +503,25 @@ run "Installing Docker Compose" \
 	    git checkout v4.2.0 && \
 	    git submodule update --init roms/seabios && \
 
-	    mkdir -p /tmp/qemu && \
-			    ./configure --prefix=/tmp/qemu \
-			    --enable-kvm \
-			    --disable-xen \
-			    --enable-libusb \
-			    --enable-debug-info \
-			    --enable-debug \
-			    --enable-sdl \
-			    --enable-vhost-net \
-			    --enable-spice \
-			    --disable-debug-tcg \
-			    --enable-opengl \
-			    --enable-gtk \ 
-			    --target-list=x86_64-softmmu \
-			    --audio-drv-list=pa  && \
-	   make -j $(nproc) &&\
+	    ./configure --prefix=/tmp/qemu \
+		--enable-kvm \
+		--disable-xen \
+		--enable-libusb \
+		--enable-debug-info \
+		--enable-debug \
+		--enable-sdl \
+		--enable-vhost-net \
+		--enable-spice \
+		--disable-debug-tcg \
+		--enable-opengl \
+		--enable-gtk \ 
+		--target-list=x86_64-softmmu \
+		--audio-drv-list=pa  && \
+	   make -j4 &&\
 
 	  cd /root/qemu/roms/seabios &&  \
-	  make -j $(nproc) && \
+	  make -j4 && \
 	  cd /root/qemu && \
 	  make install && \
-	  cp roms/seabios/out/bios.bin /tmp/qemu/bin/bios.bin  && \
-	  apt-get update && \
-	  apt-get install -y uid-dev nasm acpidump iasl bc && \
-	  git submodule update --init --recursive roms/edk && \
-	  cd  /root/qemu/roms/edk2 && \
-	  /bin/bash -c \\\"source ./edksetup.sh; make -C BaseTools/; build -b DEBUG -t GCC5 -a X64 -p OvmfPkg/OvmfPkgX64.dsc -D NETWORK_IP4_ENABLE -D NETWORK_ENABLE  -D SECURE_BOOT_ENABLE -DTPM2_ENABLE=TRUE\\\" && \
-	  cp Build/OvmfX64/DEBUG_GCC5/FV/OVMF.fd /tmp/qemu/bin/' " \
+	  cp roms/seabios/out/bios.bin /usr/bin/bios.bin'" \
  	  "TMP/provisioning.log"
